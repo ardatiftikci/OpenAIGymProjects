@@ -14,11 +14,11 @@ class QLearningAgent():
         return np.argmax(self.QTable[state])
 
     def updateQValue(self, reward, new_state, i, current_state):
-        next_value = np.max(self.QTable[new_state])
-        learned_value = reward + self.discount_factor * next_value
-        lr = self.learning_rate(i)
-        old_value = self.QTable[current_state][action]
-        self.QTable[current_state][action] = (1 - lr) * old_value + lr * learned_value
+        optimalFutureValue = np.max(self.QTable[new_state])
+        oldValue = self.QTable[current_state][action]
+        difference = reward + self.discount_factor * optimalFutureValue - oldValue
+        learningRate = self.learning_rate(i)
+        self.QTable[current_state][action] = oldValue + learningRate * difference
 
     def learning_rate(self, i):
         return max(0.01, min(1.0, 1.0 - math.log10((i + 1) / 25)))
@@ -73,4 +73,4 @@ for i in range(100):
         env.render()
         sum += reward
 
-print(sum/100)
+print("Average Reward: {}".format(sum/100))
