@@ -1,9 +1,10 @@
-#This file provides a Deep Q-Learning solution to CartPole problem in OpenAI Gym.
+#This file provides a Deep Q-Learning solution to MountainCar problem in OpenAI Gym.
 import gym
 import random
 import numpy as np
 from collections import deque
 import tensorflow as tf
+import os
 
 class DQNAgent():
 
@@ -63,7 +64,8 @@ class DQNAgent():
         self.model.save(name)
 
 
-env_name = "CartPole-v1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+env_name = "MountainCar-v0"
 env = gym.make(env_name)
 number_of_episodes = 500
 state_size = env.observation_space.shape[0]
@@ -74,16 +76,17 @@ agent = DQNAgent(state_size, action_size)
 for e in range(number_of_episodes):
     state = env.reset()
     state = np.reshape(state, [1, state_size])
-    for time in range(500):
+    reward_sum=0
+    for time in range(1000):
         #env.render()
         action = agent.act(state)
         next_state, reward, done, info = env.step(action)
-        reward = -10 if done else reward
         next_state = np.reshape(next_state, [1, state_size])
         agent.remember(state, action, reward, next_state, done)
         state = next_state
+        reward_sum += reward
         if done:
-            print("Episode Number: {}, Reward: {}".format(e, time))
+            print("Episode Number: {}, Reward: {}".format(e, reward_sum))
             break
 
     if len(agent.memory) > batch_size:
@@ -99,7 +102,7 @@ number_of_test_episodes = 100
 for t in range(number_of_test_episodes):
     state = env.reset()
     state = np.reshape(state, [1, state_size])
-    for time in range(500):
+    for time in range(1000):
         env.render()
         action = agent.act(state)
         next_state, reward, done, info = env.step(action)
